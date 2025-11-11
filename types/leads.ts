@@ -49,6 +49,7 @@ export interface CallsKPIs {
   callsBooked: number;
   callsCancelled: number;
   callShowUpRate: number;
+  bookingRate: number;
 }
 
 // Time frame options

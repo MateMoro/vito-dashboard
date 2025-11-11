@@ -114,25 +114,29 @@ export function getCallsKPIs(leads: Lead[]): CallsKPIs {
 
   const callShowUpRate = callsBooked > 0 ? (callsCompleted / callsBooked) * 100 : 0;
 
+  // Calculate booking rate: percentage of proposed calls that got booked
+  const bookingRate = callsProposed > 0 ? (callsBooked / callsProposed) * 100 : 0;
+
   return {
     callsProposed,
     callsBooked,
     callsCancelled,
     callShowUpRate,
+    bookingRate,
   };
 }
 
 /**
- * Generate mock trend data for mini charts
- * In the future, this can be replaced with real historical data
+ * Generate empty trend data for mini charts
+ * Returns zeroed data points until real historical data is available
  */
-export function generateMockTrendData(points: number = 7): TrendData[] {
+export function generateEmptyTrendData(points: number = 7): TrendData[] {
   const data: TrendData[] = [];
   const now = new Date();
 
   for (let i = points - 1; i >= 0; i--) {
     const date = subDays(now, i);
-    const value = Math.floor(Math.random() * 50) + 20; // Random values between 20-70
+    const value = 0; // Zero values until real data is available
 
     data.push({
       date: date.toISOString().split('T')[0],
