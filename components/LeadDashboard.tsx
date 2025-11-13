@@ -32,6 +32,32 @@ export default function LeadDashboard() {
   const [crmDateRange, setCrmDateRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [showCrmDatePicker, setShowCrmDatePicker] = useState(false);
 
+  // Modal state
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  // Handle modal actions
+  const openModal = (lead: Lead) => {
+    setSelectedLead(lead);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedLead(null);
+  };
+
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showModal) {
+        closeModal();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [showModal]);
+
   // Fetch leads from Supabase
   useEffect(() => {
     async function fetchLeads() {
@@ -113,8 +139,8 @@ export default function LeadDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-5xl font-bold mb-2 tracking-tight">Lead Dashboard</h1>
-          <p className="text-gray-400 text-lg">Instagram Lead Analytics</p>
+          <h1 className="text-5xl font-bold mb-2 tracking-tight">Dashboard Lead</h1>
+          <p className="text-gray-400 text-lg">Analisi Lead Instagram</p>
         </div>
 
         {/* Tabs */}
@@ -127,7 +153,7 @@ export default function LeadDashboard() {
                 : 'border-transparent text-gray-400 hover:text-gray-300'
             }`}
           >
-            KPIs Dashboard
+            Dashboard KPIs
           </button>
           <button
             onClick={() => setActiveTab('crm')}
@@ -137,7 +163,7 @@ export default function LeadDashboard() {
                 : 'border-transparent text-gray-400 hover:text-gray-300'
             }`}
           >
-            CRM View
+            Vista CRM
           </button>
         </div>
 
@@ -172,7 +198,7 @@ export default function LeadDashboard() {
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            Custom Range
+            Intervallo Personalizzato
           </button>
         </div>
 
@@ -207,7 +233,7 @@ export default function LeadDashboard() {
               {/* Search */}
               <input
                 type="text"
-                placeholder="Search by name or username..."
+                placeholder="Cerca per nome o username..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 min-w-[250px] px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
@@ -219,11 +245,11 @@ export default function LeadDashboard() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
               >
-                <option value="all">All Statuses</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-                <option value="responded">Responded</option>
+                <option value="all">Tutti gli Stati</option>
+                <option value="in_progress">In Corso</option>
+                <option value="completed">Completato</option>
+                <option value="failed">Fallito</option>
+                <option value="responded">Risposto</option>
                 <option value="opt_out">Opt Out</option>
               </select>
 
@@ -233,15 +259,15 @@ export default function LeadDashboard() {
                 onChange={(e) => setStageFilter(e.target.value)}
                 className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
               >
-                <option value="all">All Stages</option>
-                <option value="Initial Contact">Initial Contact</option>
-                <option value="Rapport Building">Rapport Building</option>
-                <option value="Qualification">Qualification</option>
-                <option value="Call Proposed">Call Proposed</option>
-                <option value="Call Booked">Call Booked</option>
-                <option value="Post-Call Follow-up">Post-Call Follow-up</option>
-                <option value="Closed/Won">Closed/Won</option>
-                <option value="Closed/Lost">Closed/Lost</option>
+                <option value="all">Tutte le Fasi</option>
+                <option value="Initial Contact">Contatto Iniziale</option>
+                <option value="Rapport Building">Costruzione Rapporto</option>
+                <option value="Qualification">Qualificazione</option>
+                <option value="Call Proposed">Chiamata Proposta</option>
+                <option value="Call Booked">Chiamata Prenotata</option>
+                <option value="Post-Call Follow-up">Follow-up Post-Chiamata</option>
+                <option value="Closed/Won">Chiuso/Vinto</option>
+                <option value="Closed/Lost">Chiuso/Perso</option>
                 <option value="Ghosted">Ghosted</option>
               </select>
 
@@ -254,7 +280,7 @@ export default function LeadDashboard() {
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                Date Filter
+                Filtro Data
               </button>
 
               {/* Clear Filters */}
@@ -269,7 +295,7 @@ export default function LeadDashboard() {
                   }}
                   className="px-5 py-2.5 rounded-lg font-medium bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-all duration-200"
                 >
-                  Clear Filters
+                  Cancella Filtri
                 </button>
               )}
             </div>
@@ -300,7 +326,7 @@ export default function LeadDashboard() {
         {/* Loading / Error States */}
         {loading && (
           <div className="text-center py-12 text-gray-400 text-lg">
-            Loading dashboard data...
+            Caricamento dati dashboard...
           </div>
         )}
 
@@ -315,31 +341,31 @@ export default function LeadDashboard() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               <KPICard
-                title="Total Leads"
+                title="Lead Totali"
                 value={formatNumber(leadKPIs.totalLeads)}
                 trend={generateEmptyTrendData()}
                 color="blue"
               />
               <KPICard
-                title="Leads Won"
+                title="Lead Vinti"
                 value={formatNumber(leadKPIs.leadsWon)}
                 trend={generateEmptyTrendData()}
                 color="green"
               />
               <KPICard
-                title="Leads Lost"
+                title="Lead Persi"
                 value={formatNumber(leadKPIs.leadsLost)}
                 trend={generateEmptyTrendData()}
                 color="red"
               />
               <KPICard
-                title="In Progress"
+                title="In Corso"
                 value={formatNumber(leadKPIs.leadsInProgress)}
                 trend={generateEmptyTrendData()}
                 color="yellow"
               />
               <KPICard
-                title="Response Rate"
+                title="Reply Rate"
                 value={formatPercentage(leadKPIs.responseRate)}
                 trend={generateEmptyTrendData()}
                 color="purple"
@@ -354,31 +380,25 @@ export default function LeadDashboard() {
 
             {/* Calls KPIs Section */}
             <div className="mb-8">
-              <h2 className="text-3xl font-bold mb-6 tracking-tight">Calls KPIs</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              <h2 className="text-3xl font-bold mb-6 tracking-tight">KPI Chiamate</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <KPICard
-                  title="Calls Proposed"
+                  title="Chiamate Proposte"
                   value={formatNumber(callsKPIs.callsProposed)}
                   trend={generateEmptyTrendData()}
                   color="cyan"
                 />
                 <KPICard
-                  title="Calls Booked"
+                  title="Chiamate Prenotate"
                   value={formatNumber(callsKPIs.callsBooked)}
                   trend={generateEmptyTrendData()}
                   color="teal"
                 />
                 <KPICard
-                  title="Calls Cancelled"
+                  title="Chiamate Cancellate"
                   value={formatNumber(callsKPIs.callsCancelled)}
                   trend={generateEmptyTrendData()}
                   color="pink"
-                />
-                <KPICard
-                  title="Show-up Rate"
-                  value={formatPercentage(callsKPIs.callShowUpRate)}
-                  trend={generateEmptyTrendData()}
-                  color="indigo"
                 />
                 <KPICard
                   title="Booking Rate"
@@ -399,17 +419,17 @@ export default function LeadDashboard() {
               <table className="w-full">
                 <thead className="bg-gray-900/50">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">IG Username</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Full Name</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Username IG</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nome Completo</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Occupation</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Stato</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Data</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Occupazione</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Pain Point</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Age</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Stage</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Goals</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Motivation</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Età</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fase</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Obiettivi</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Motivazione</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Timeline</th>
                   </tr>
                 </thead>
@@ -417,12 +437,16 @@ export default function LeadDashboard() {
                   {filteredCrmLeads.length === 0 ? (
                     <tr>
                       <td colSpan={12} className="px-6 py-12 text-center text-gray-400">
-                        No leads found matching your filters.
+                        Nessun lead trovato con i filtri selezionati.
                       </td>
                     </tr>
                   ) : (
                     filteredCrmLeads.map((lead) => (
-                      <tr key={lead.id} className="hover:bg-gray-700/50 transition-colors">
+                      <tr
+                        key={lead.id}
+                        className="hover:bg-gray-700/50 transition-colors cursor-pointer"
+                        onClick={() => openModal(lead)}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-400">
                           @{lead.ig_username}
                         </td>
@@ -471,11 +495,16 @@ export default function LeadDashboard() {
             {/* Results Count */}
             <div className="px-6 py-4 bg-gray-900/30 border-t border-gray-700">
               <p className="text-sm text-gray-400">
-                Showing <span className="font-medium text-white">{filteredCrmLeads.length}</span> of{' '}
+                Visualizzati <span className="font-medium text-white">{filteredCrmLeads.length}</span> di{' '}
                 <span className="font-medium text-white">{leads.length}</span> leads
               </p>
             </div>
           </div>
+        )}
+
+        {/* Lead Detail Modal */}
+        {showModal && selectedLead && (
+          <LeadDetailModal lead={selectedLead} onClose={closeModal} />
         )}
       </div>
     </div>
@@ -497,10 +526,10 @@ function StatusBadge({ status }: StatusBadgeProps) {
   };
 
   const statusLabels = {
-    completed: 'Completed',
-    in_progress: 'In Progress',
-    failed: 'Failed',
-    responded: 'Responded',
+    completed: 'Completato',
+    in_progress: 'In Corso',
+    failed: 'Fallito',
+    responded: 'Risposto',
     opt_out: 'Opt Out',
   };
 
@@ -534,11 +563,24 @@ function StageBadge({ stage }: StageBadgeProps) {
     'Ghosted': 'bg-gray-600/20 text-gray-400 border-gray-600/30',
   };
 
+  const stageLabels = {
+    'Initial Contact': 'Contatto Iniziale',
+    'Rapport Building': 'Costruzione Rapporto',
+    'Qualification': 'Qualificazione',
+    'Call Proposed': 'Chiamata Proposta',
+    'Call Booked': 'Chiamata Prenotata',
+    'Post-Call Follow-up': 'Follow-up Post-Chiamata',
+    'Closed/Won': 'Chiuso/Vinto',
+    'Closed/Lost': 'Chiuso/Perso',
+    'Ghosted': 'Ghosted',
+  };
+
   const colorClass = stageColors[stage as keyof typeof stageColors] || 'bg-gray-600/20 text-gray-400 border-gray-600/30';
+  const label = stageLabels[stage as keyof typeof stageLabels] || stage;
 
   return (
     <span className={`px-3 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${colorClass}`}>
-      {stage}
+      {label}
     </span>
   );
 }
@@ -603,6 +645,109 @@ function KPICard({ title, value, trend, color, subtitle }: KPICardProps) {
           </LineChart>
         </ResponsiveContainer>
       </div>
+    </div>
+  );
+}
+
+// Lead Detail Modal Component
+interface LeadDetailModalProps {
+  lead: Lead;
+  onClose: () => void;
+}
+
+function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-gray-800 rounded-2xl border border-gray-700 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-8 py-6 flex justify-between items-start">
+          <div>
+            <h2 className="text-3xl font-bold text-blue-400 mb-1">@{lead.ig_username}</h2>
+            {lead.full_name && (
+              <p className="text-xl text-gray-300">{lead.full_name}</p>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="px-8 py-6 space-y-6">
+          {/* Status Row */}
+          <div className="flex flex-wrap gap-4 items-center">
+            <StatusBadge status={lead.status} />
+            {lead.conversation_stage && <StageBadge stage={lead.conversation_stage} />}
+          </div>
+
+          {/* Basic Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <DetailField label="Email" value={lead.email} />
+            <DetailField
+              label="Data"
+              value={lead.initial_contact_date ? new Date(lead.initial_contact_date).toLocaleDateString('it-IT') : null}
+            />
+            <DetailField label="Occupazione" value={lead.occupation} />
+            <DetailField label="Età" value={lead.age?.toString()} />
+          </div>
+
+          {/* Full Text Fields */}
+          <div className="space-y-6 pt-4 border-t border-gray-700">
+            <DetailFieldFull
+              label="Pain Point"
+              value={lead.pain_point}
+              highlight={true}
+            />
+            <DetailFieldFull label="Obiettivi" value={lead.goals} />
+            <DetailFieldFull label="Motivazione" value={lead.motivation} />
+            <DetailFieldFull label="Timeline" value={lead.timeline} />
+            {lead.notes && <DetailFieldFull label="Note" value={lead.notes} />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Helper components for modal
+interface DetailFieldProps {
+  label: string;
+  value: string | null | undefined;
+}
+
+function DetailField({ label, value }: DetailFieldProps) {
+  return (
+    <div>
+      <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">{label}</p>
+      <p className="text-base text-gray-200">{value || '-'}</p>
+    </div>
+  );
+}
+
+interface DetailFieldFullProps {
+  label: string;
+  value: string | null | undefined;
+  highlight?: boolean;
+}
+
+function DetailFieldFull({ label, value, highlight = false }: DetailFieldFullProps) {
+  if (!value) return null;
+
+  return (
+    <div className={highlight ? 'bg-purple-900/20 border border-purple-600/30 rounded-xl p-4' : ''}>
+      <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">{label}</p>
+      <p className="text-base text-gray-200 leading-relaxed whitespace-pre-wrap">{value}</p>
     </div>
   );
 }
